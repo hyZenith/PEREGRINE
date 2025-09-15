@@ -3,6 +3,7 @@ const Post = require("../models/Post.js")
 const getPosts = async(req, res) => {
     const posts = await Post.find().sort({createdAt: -1});
     res.json(posts);
+    if (!posts) return res.send("There is no Post")
 }
 
 const likedPost = async (req, res) => {
@@ -37,4 +38,4 @@ const sharePost = async (req,res) => {
 
 }
 
-module.exports = { getPost, likedPost, commentPost, sharePost };
+module.exports = { getPosts, likedPost, commentPost, sharePost };
