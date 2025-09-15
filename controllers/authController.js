@@ -5,6 +5,9 @@ const bcrypt = require('bcrypt')
 require('dotenv').config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
 
 // REGISTER
 const registerUser = async (req, res) => {
@@ -26,16 +29,17 @@ const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         // Create user
-        const newUser = new User({ name, email, password: hashedPassword });
+        const newUser = new User({ name, email, password: hashedPassword , isAdmin: false});
         await newUser.save();
 
         // Generate JWT
         const token = jwt.sign(
-            { userId: newUser._id, name: newUser.name },
+            { userId: newUser._id, name: newUser.name , isAdmin:false},
             JWT_SECRET,
             { expiresIn: '12h' }
         );
-
+        
+        
         return res.status(201).json({ message: "User registered successfully", token });
 
     } catch (error) {
@@ -52,29 +56,54 @@ const loginUser = async (req, res) => {
         if (!email || !password) {
             return res.status(400).json({ message: "Email and password are required" });
         }
+        
+        // admin login
+        let user;
+        // if admin login , match with .env credentials
+        if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+            user = { _id:'admin', isAdmin: true, name: 'Admin'}
+            console.log("admin is logged in")
+        } else{
+            user = await User.findOne({email});
+            if (!user) return res.status(401).json({message: "invalid credentials"});
 
-        // Find user by email
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(401).json({ message: "Invalid credentials" });
+
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (!isMatch) return res.status(401).json({message: "match did not match"})
         }
 
-        // Compare password
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ message: "Invalid credentials" });
-        }
-  
-
-
-        // Generate JWT
         const token = jwt.sign(
             { userId: user._id, name: user.name },
             JWT_SECRET,
             { expiresIn: '12h' }
         );
 
+        res.cookie("token", token);
         return res.status(200).json({ message: "Login successful", token });
+
+        
+        // Normal user login
+        // Find user by email
+        // const user = await User.findOne({ email });
+        // if (!user) {
+        //     return res.status(401).json({ message: "Invalid credentials" });
+        // }
+
+
+        
+        // Compare password
+        // const isMatch = await bcrypt.compare(password, user.password);
+        // if (!isMatch) {
+        //     return res.status(401).json({ message: "Invalid credentials" });
+        // }
+
+        // Generate JWT
+        // const token = jwt.sign(
+        //     { userId: user._id, name: user.name },
+        //     JWT_SECRET,
+        //     { expiresIn: '12h' }
+        // );
+
 
     } catch (error) {
         console.error('Error logging in user:', error);
