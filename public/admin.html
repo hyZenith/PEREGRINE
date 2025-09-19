@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PEREGRINE - Admin Panel</title>
+    <link rel="stylesheet" href="css/admin.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-logo">
+          <h1>PEREGRINE - Admin</h1>
+        </div>
+        <div class="nav-links">
+          <a href="home.html">Home</a>
+          <a href="#" class="active">Admin</a>
+          <a href="#" id="logout-btn">Logout</a>
+        </div>
+        <div class="user-info">
+          <span id="user-name">Admin</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+      <div class="admin-section">
+        <h2>Create New Post</h2>
+        <div class="post-form">
+          <div class="form-group">
+            <label for="post-content">Post Content</label>
+            <textarea
+              id="post-content"
+              rows="5"
+              placeholder="Enter your post content here..."
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <button id="create-post-btn">Create Post</button>
+          </div>
+          <div id="post-status" class="status-message"></div>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h2>Recent Posts</h2>
+        <div class="posts-container" id="posts-container">
+          <!-- Recent posts will be loaded here -->
+          <div class="loading-message">Loading posts...</div>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h2>Comment Summaries</h2>
+        <div id="summaries-container">
+          <!-- Comment summaries will be loaded here -->
+          <div class="loading-message">
+            Select a post to view comment summary
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h2>Comment Sentiment Analysis</h2>
+        <div class="sentiment-summary">
+          <div class="sentiment-chart-container">
+            <canvas id="sentimentChart"></canvas>
+          </div>
+          <div class="sentiment-stats">
+            <div class="stat-box positive">
+              <div class="stat-label">Positive</div>
+              <div class="stat-value" id="positive-count">0</div>
+            </div>
+            <div class="stat-box negative">
+              <div class="stat-label">Negative</div>
+              <div class="stat-value" id="negative-count">0</div>
+            </div>
+            <div class="stat-box neutral">
+              <div class="stat-label">Neutral</div>
+              <div class="stat-value" id="neutral-count">0</div>
+            </div>
+          </div>
+        </div>
+        <div class="recent-comments">
+          <h3>Recent Comments</h3>
+          <div class="comments-container" id="comments-container">
+            <!-- Recent comments will be loaded here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Post Template (Hidden, used for JS cloning) -->
+    <template id="post-template">
+      <div class="admin-post">
+        <div class="post-header">
+          <div class="post-id">Post ID: <span></span></div>
+          <div class="post-date">Posted on <span class="date"></span></div>
+        </div>
+        <div class="post-content">
+          <p></p>
+        </div>
+        <div class="post-stats">
+          <div class="stat-item"><i class="fas fa-thumbs-up"></i> <span class="like-count">0</span> Likes</div>
+          <div class="stat-item"><i class="fas fa-comment"></i> <span class="comment-count">0</span> Comments</div>
+          <div class="stat-item"><i class="fas fa-share"></i> <span class="share-count">0</span> Shares</div>
+        </div>
+        <div class="post-actions">
+          <button class="view-comments-btn">View Comments</button>
+          <button class="generate-summary-btn">Generate Summary</button>
+          <button class="delete-post-btn">Delete Post</button>
+        </div>
+      </div>
+    </template>
+
+    <!-- Comment Template (Hidden, used for JS cloning) -->
+    <template id="comment-template">
+      <div class="admin-comment">
+        <div class="comment-header">
+          <div class="comment-user"></div>
+          <div class="comment-date"></div>
+        </div>
+        <div class="comment-content">
+          <p></p>
+        </div>
+        <div class="comment-sentiment-badge"></div>
+      </div>
+    </template>
+
+    <!-- Summary Template (Hidden, used for JS cloning) -->
+    <template id="summary-template">
+      <div class="summary-card">
+        <div class="summary-header">
+          <h3>Comment Summary</h3>
+          <button class="close-summary"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="summary-content">
+          <p></p>
+        </div>
+      </div>
+    </template>
+
+    <!-- Include Chart.js for visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/admin.js"></script>
+  </body>
+</html>
