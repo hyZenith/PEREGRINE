@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PEREGRINE - Create Post</title>
+    <link rel="stylesheet" href="css/admin.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-logo">
+          <h1>PEREGRINE - Admin</h1>
+        </div>
+        <div class="nav-links">
+          <a href="home.html">Home</a>
+          <a href="admin.html">Admin</a>
+          <a href="#" class="active">Post</a>
+          <a href="#" id="logout-btn">Logout</a>
+        </div>
+        <div class="user-info">
+          <span id="user-name">Admin</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+      <div class="admin-section">
+        <h2>Create New Post</h2>
+        <p class="section-description">
+          Create and publish content that will be visible to all users on the homepage
+        </p>
+        <div class="post-form">
+          <div class="form-group">
+            <label for="post-title">Post Title</label>
+            <input
+              type="text"
+              id="post-title"
+              placeholder="Enter post title..."
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="post-content">Content</label>
+            <textarea
+              id="post-content"
+              rows="8"
+              placeholder="Write your post content here..."
+              class="form-textarea"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="embed-link">Embed Link (Optional)</label>
+            <input
+              type="url"
+              id="embed-link"
+              placeholder="https://example.com/embed-link"
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="file-upload">File Attachments</label>
+            <div class="file-upload-area" id="file-upload-area">
+              <input
+                type="file"
+                id="file-upload"
+                multiple
+                accept="image/*,.pdf"
+                style="display: none"
+              />
+              <div class="upload-placeholder">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>Upload Images or PDFs</span>
+              </div>
+            </div>
+            <div id="file-list" class="file-list"></div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="save-draft-btn" class="btn btn-secondary">
+              <i class="fas fa-save"></i> Save as Draft
+            </button>
+            <button type="button" id="create-post-btn" class="btn btn-primary">
+              <i class="fas fa-eye"></i> Publish Post
+            </button>
+          </div>
+
+          <div id="post-status" class="status-message"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Include Chart.js for consistency (not required here) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/admin.js"></script>
+  </body>
+</html>

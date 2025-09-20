@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debug Delete API</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 2em;
+        line-height: 1.6;
+      }
+      input,
+      button {
+        padding: 8px;
+        margin: 5px;
+      }
+      #log {
+        background-color: #f5f5f5;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 20px;
+        white-space: pre-wrap;
+        height: 300px;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Debug Delete API</h1>
+
+    <div>
+      <label>API URL Base:</label>
+      <input
+        type="text"
+        id="apiUrl"
+        value="http://localhost:3000"
+        style="width: 300px"
+      />
+    </div>
+
+    <div>
+      <label>JWT Token:</label>
+      <input
+        type="text"
+        id="token"
+        placeholder="Enter your JWT token here"
+        style="width: 400px"
+      />
+    </div>
+
+    <div>
+      <label>Post ID to delete:</label>
+      <input
+        type="text"
+        id="postId"
+        placeholder="Enter the post ID here"
+        style="width: 300px"
+      />
+      <button onclick="deletePost()">Delete Post</button>
+    </div>
+
+    <div>
+      <button onclick="loadPosts()">Load All Posts</button>
+    </div>
+
+    <div id="log">Logs will appear here...</div>
+
+    <script>
+      const logElement = document.getElementById("log");
+
+      function log(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        logElement.textContent += `[${timestamp}] ${message}\n`;
+        logElement.scrollTop = logElement.scrollHeight;
+      }
+
+      async function deletePost() {
+        const apiUrl = document.getElementById("apiUrl").value;
+        const token = document.getElementById("token").value;
+        const postId = document.getElementById("postId").value;
+
+        if (!token || !postId) {
+          log("ERROR: Both token and postId are required!");
+          return;
+        }
+
+        log(`Attempting to delete post with ID: ${postId}`);
+
+        try {
+          // Simple fetch request to the delete endpoint
+          log(`Making DELETE request to: ${apiUrl}/posts/${postId}`);
+
+          const response = await fetch(`${apiUrl}/posts/${postId}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          log(`Response status: ${response.status} ${response.statusText}`);
+
+          try {
+            const responseText = await response.text();
+            log(`Raw response: ${responseText}`);
+
+            if (responseText && responseText.trim()) {
+              try {
+                const jsonData = JSON.parse(responseText);
+                log(`Parsed JSON: ${JSON.stringify(jsonData, null, 2)}`);
+              } catch (jsonError) {
+                log(`Not valid JSON: ${responseText}`);
+              }
+            }
+          } catch (textError) {
+            log(`Error reading response text: ${textError.message}`);
+          }
+
+          if (response.ok) {
+            log("SUCCESS: Post deleted!");
+          } else {
+            log(`ERROR: Failed to delete post. Status: ${response.status}`);
+          }
+        } catch (error) {
+          log(`NETWORK ERROR: ${error.message}`);
+        }
+      }
+
+      async function loadPosts() {
+        const apiUrl = document.getElementById("apiUrl").value;
+        const token = document.getElementById("token").value;
+
+        if (!token) {
+          log("ERROR: Token is required to load posts!");
+          return;
+        }
+
+        log("Loading all posts...");
+
+        try {
+          const response = await fetch(`${apiUrl}/posts`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          log(`Response status: ${response.status} ${response.statusText}`);
+
+          if (response.ok) {
+            const posts = await response.json();
+            log(`Found ${posts.length} posts:`);
+
+            posts.forEach((post) => {
+              log(
+                `ID: ${post._id}, Content: ${post.content.substring(0, 30)}...`
+              );
+            });
+          } else {
+            log(`ERROR: Failed to load posts. Status: ${response.status}`);
+          }
+        } catch (error) {
+          log(`NETWORK ERROR: ${error.message}`);
+        }
+      }
+    </script>
+  </body>
+</html>

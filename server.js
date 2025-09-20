@@ -2,18 +2,27 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const path = require("path");
+const fs = require("fs");
 const port = process.env.PORT || 3000;
 const connectDB = require("./db/db");
 const { registerUser, loginUser } = require("./controllers/authController.js");
-const { createPost } = require("./controllers/adminController.js");
+const { createPost, upload } = require("./controllers/adminController.js");
 const {
   getPosts,
   likedPost,
   commentPost,
   sharePost,
   getPostSummary,
+  deletePost,
 } = require("./controllers/postController.js");
 const jwt = require("jsonwebtoken");
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, "public", "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log("Created uploads directory:", uploadsDir);
+}
 
 // middleware to parse JSON
 app.use(express.json());
@@ -60,9 +69,16 @@ app.post("/posts/:id/like", authenticateToken, likedPost);
 app.post("/posts/:id/comment", authenticateToken, commentPost);
 app.post("/posts/:id/share", authenticateToken, sharePost);
 app.get("/posts/:id/summary", authenticateToken, getPostSummary);
+app.delete("/posts/:id", authenticateToken, isAdmin, deletePost); // Admin only route for deleting posts
 
 // Admin routes
-app.post("/admin/posts", authenticateToken, isAdmin, createPost);
+app.post(
+  "/admin/posts",
+  authenticateToken,
+  isAdmin,
+  upload.array("files", 5),
+  createPost
+);
 
 // Serve Python scripts for sentiment analysis
 app.use("/utils", express.static(path.join(__dirname, "utils")));
@@ -73,5 +89,9 @@ app.get("*", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+  console.log(`🚀 Server is running at http://localhost:${port}`);
+  console.log(
+    `📁 Serving static files from: ${path.join(__dirname, "public")}`
+  );
+  console.log(`🌐 Open in browser: http://localhost:${port}`);
 });

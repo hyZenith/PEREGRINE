@@ -20,6 +20,7 @@
         <div class="nav-links">
           <a href="home.html">Home</a>
           <a href="#" class="active">Admin</a>
+          <a href="post.html">Post</a>
           <a href="#" id="logout-btn">Logout</a>
         </div>
         <div class="user-info">
@@ -30,23 +31,7 @@
 
     <!-- Main Content -->
     <div class="main-container">
-      <div class="admin-section">
-        <h2>Create New Post</h2>
-        <div class="post-form">
-          <div class="form-group">
-            <label for="post-content">Post Content</label>
-            <textarea
-              id="post-content"
-              rows="5"
-              placeholder="Enter your post content here..."
-            ></textarea>
-          </div>
-          <div class="form-group">
-            <button id="create-post-btn">Create Post</button>
-          </div>
-          <div id="post-status" class="status-message"></div>
-        </div>
-      </div>
+      
 
       <div class="admin-section">
         <h2>Recent Posts</h2>
@@ -88,7 +73,19 @@
           </div>
         </div>
         <div class="recent-comments">
-          <h3>Recent Comments</h3>
+          <h3 style="display:flex; align-items:center; gap:12px; justify-content:space-between;">
+            <span>Recent Comments</span>
+            <div class="comments-filter">
+              <label for="comments-filter" class="filter-label">Filter</label>
+              <select id="comments-filter" class="filter-select">
+                <option value="all">All</option>
+                <option value="positive">Positive</option>
+                <option value="negative">Negative</option>
+                <option value="neutral">Neutral</option>
+              </select>
+              <span id="comments-filter-count" class="filter-count">0</span>
+            </div>
+          </h3>
           <div class="comments-container" id="comments-container">
             <!-- Recent comments will be loaded here -->
           </div>
@@ -107,9 +104,18 @@
           <p></p>
         </div>
         <div class="post-stats">
-          <div class="stat-item"><i class="fas fa-thumbs-up"></i> <span class="like-count">0</span> Likes</div>
-          <div class="stat-item"><i class="fas fa-comment"></i> <span class="comment-count">0</span> Comments</div>
-          <div class="stat-item"><i class="fas fa-share"></i> <span class="share-count">0</span> Shares</div>
+          <div class="stat-item">
+            <i class="fas fa-thumbs-up"></i>
+            <span class="like-count">0</span> Likes
+          </div>
+          <div class="stat-item">
+            <i class="fas fa-comment"></i>
+            <span class="comment-count">0</span> Comments
+          </div>
+          <div class="stat-item">
+            <i class="fas fa-share"></i>
+            <span class="share-count">0</span> Shares
+          </div>
         </div>
         <div class="post-actions">
           <button class="view-comments-btn">View Comments</button>

@@ -1,7 +1,19 @@
 const mongoose = require("mongoose");
 
 const postSchema = new mongoose.Schema({
+  title: { type: String, default: "" },
   content: { type: String, required: true },
+  embedLink: { type: String, default: "" },
+  attachments: [
+    {
+      filename: String,
+      originalname: String,
+      mimetype: String,
+      size: Number,
+      path: String,
+    },
+  ],
+  isDraft: { type: Boolean, default: false },
   likes: { type: Number, default: 0 },
   comments: [
     {

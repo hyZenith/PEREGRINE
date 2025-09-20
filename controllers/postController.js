@@ -91,10 +91,73 @@ const getPostSummary = async (req, res) => {
   }
 };
 
+// Delete a post (admin only)
+const deletePost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+
+    // Log the request details
+    console.log(`Attempting to delete post with ID: ${postId}`);
+    console.log("Request headers:", req.headers);
+    console.log("Auth user:", req.user);
+
+    // More lenient validation - just make sure we have an ID
+    if (!postId) {
+      console.log(`Missing post ID in request`);
+      return res.status(400).json({
+        success: false,
+        message: "Missing post ID",
+      });
+    }
+
+    // Check if this is a valid MongoDB ObjectId
+    let isValidObjectId = /^[0-9a-fA-F]{24}$/.test(postId);
+    console.log(`Is valid MongoDB ObjectId: ${isValidObjectId}`);
+
+    // Try to find the post first to confirm it exists
+    const post = await Post.findById(postId);
+    if (!post) {
+      console.log(`Post not found with ID: ${postId}`);
+
+      // Try a more general query to see if we can find the post by other means
+      const allPosts = await Post.find({});
+      console.log(`Total posts in database: ${allPosts.length}`);
+      console.log(`Available post IDs: ${allPosts.map((p) => p._id)}`);
+
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+
+    // Post exists, proceed with deletion
+    console.log(`Found post to delete:`, post);
+    const deletedPost = await Post.findByIdAndDelete(postId);
+
+    console.log(`Successfully deleted post: ${postId}`);
+    return res.json({
+      success: true,
+      message: "Post deleted successfully",
+      postId: postId,
+    });
+  } catch (error) {
+    console.error("Error deleting post:", error);
+
+    // More detailed error response
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete post",
+      error: error.message,
+      stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+    });
+  }
+};
+
 module.exports = {
   getPosts,
   likedPost,
   commentPost,
   sharePost,
   getPostSummary,
+  deletePost,
 };

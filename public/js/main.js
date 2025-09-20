@@ -77,11 +77,32 @@ function renderPosts(posts) {
     const template = document.getElementById("post-template");
     const postElement = document.importNode(template.content, true);
 
+    // Fill post title if exists
+    const titleElement = postElement.querySelector(".post-title");
+    if (post.title && post.title.trim()) {
+      titleElement.textContent = post.title;
+      titleElement.style.display = "block";
+    }
+
     // Fill post content
     postElement.querySelector(".post-content p").textContent = post.content;
     postElement.querySelector(".post-date .date").textContent = formatDate(
       post.createdAt
     );
+
+    // Render attachments if they exist
+    const attachmentsElement = postElement.querySelector(".post-attachments");
+    if (post.attachments && post.attachments.length > 0) {
+      attachmentsElement.innerHTML = renderAttachments(post.attachments);
+      attachmentsElement.style.display = "block";
+    }
+
+    // Render embed link if exists
+    const embedLinkElement = postElement.querySelector(".embed-link");
+    if (post.embedLink && post.embedLink.trim()) {
+      embedLinkElement.innerHTML = `<a href="${post.embedLink}" target="_blank">${post.embedLink}</a>`;
+      embedLinkElement.style.display = "block";
+    }
 
     // Set likes count
     postElement.querySelector(".like-count").textContent = post.likes || 0;
@@ -288,6 +309,27 @@ function formatDate(dateString) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+// Render attachments function
+function renderAttachments(attachments) {
+  if (!attachments || attachments.length === 0) return "";
+
+  let html = "";
+  attachments.forEach((attachment) => {
+    if (attachment.mimetype.startsWith("image/")) {
+      html += `<div class="attachment-item">
+        <img src="uploads/${attachment.filename}" alt="${attachment.originalname}" class="attachment-image" style="max-width: 100%; height: auto; border-radius: 8px; margin: 10px 0;" />
+      </div>`;
+    } else if (attachment.mimetype === "application/pdf") {
+      html += `<div class="attachment-item">
+        <a href="uploads/${attachment.filename}" target="_blank" class="attachment-pdf" style="display: inline-block; padding: 10px; background-color: #f0f0f0; border-radius: 5px; text-decoration: none; color: #333; margin: 5px 0;">
+          <i class="fas fa-file-pdf" style="color: #d32f2f;"></i> ${attachment.originalname}
+        </a>
+      </div>`;
+    }
+  });
+  return html;
 }
 
 // Run on page load

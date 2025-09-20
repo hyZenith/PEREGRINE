@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Delete Functionality</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.6;
+      }
+      .post {
+        background: #f9f9f9;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+      }
+      .post-content {
+        margin-bottom: 10px;
+      }
+      .post-actions {
+        margin-top: 10px;
+      }
+      button {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+      .delete-btn {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        border-radius: 4px;
+      }
+      .results {
+        background: #e9ffe9;
+        padding: 10px;
+        border-radius: 4px;
+        margin-top: 20px;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Test Delete Functionality</h1>
+
+    <div id="posts-container">
+      <div class="loading">Loading posts...</div>
+    </div>
+
+    <div class="results" id="results">Results will appear here...</div>
+
+    <script>
+      const API_URL = "http://localhost:3002/api";
+      const postsContainer = document.getElementById("posts-container");
+      const resultsContainer = document.getElementById("results");
+
+      // Load posts when page loads
+      window.addEventListener("DOMContentLoaded", loadPosts);
+
+      async function loadPosts() {
+        try {
+          // Get the admin token from localStorage if available
+          const token = localStorage.getItem("token");
+
+          // If no token in localStorage, ask for one
+          if (!token) {
+            const userToken = prompt("Please enter your admin JWT token:");
+            if (userToken) {
+              localStorage.setItem("token", userToken);
+            } else {
+              postsContainer.innerHTML =
+                "<div class='error'>No token provided</div>";
+              return;
+            }
+          }
+
+          const response = await fetch(`${API_URL}/posts`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(
+              `Failed to fetch posts: ${response.status} ${response.statusText}`
+            );
+          }
+
+          const posts = await response.json();
+          displayPosts(posts);
+        } catch (error) {
+          console.error("Error loading posts:", error);
+          postsContainer.innerHTML = `<div class="error">Error loading posts: ${error.message}</div>`;
+        }
+      }
+
+      function displayPosts(posts) {
+        if (!posts || posts.length === 0) {
+          postsContainer.innerHTML = "<div>No posts found</div>";
+          return;
+        }
+
+        postsContainer.innerHTML = "";
+
+        posts.forEach((post) => {
+          const postDiv = document.createElement("div");
+          postDiv.className = "post";
+
+          // Use either _id or id, depending on what's available
+          const postId = post._id || post.id;
+
+          postDiv.innerHTML = `
+                    <div class="post-content">
+                        <strong>ID:</strong> <span class="post-id">${postId}</span><br>
+                        <strong>Content:</strong> ${post.content.substring(
+                          0,
+                          100
+                        )}${post.content.length > 100 ? "..." : ""}
+                    </div>
+                    <div class="post-actions">
+                        <button class="delete-btn" data-id="${postId}">Delete Post</button>
+                    </div>
+                `;
+
+          const deleteBtn = postDiv.querySelector(".delete-btn");
+          deleteBtn.addEventListener("click", () => deletePost(postId));
+
+          postsContainer.appendChild(postDiv);
+        });
+      }
+
+      async function deletePost(postId) {
+        try {
+          log(`Attempting to delete post with ID: ${postId}`);
+
+          const token = localStorage.getItem("token");
+          if (!token) {
+            log("No token available. Please reload the page.");
+            return;
+          }
+
+          log(`Making DELETE request to: ${API_URL}/posts/${postId}`);
+
+          // Use XMLHttpRequest for better debugging
+          const xhr = new XMLHttpRequest();
+
+          xhr.open("DELETE", `${API_URL}/posts/${postId}`, true);
+          xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+          xhr.setRequestHeader("Content-Type", "application/json");
+          xhr.setRequestHeader("Accept", "application/json");
+
+          xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+              log(`Response status: ${xhr.status} ${xhr.statusText}`);
+              log(`Response headers: ${xhr.getAllResponseHeaders()}`);
+
+              if (xhr.responseText) {
+                try {
+                  const responseData = JSON.parse(xhr.responseText);
+                  log(
+                    `Response data: ${JSON.stringify(responseData, null, 2)}`
+                  );
+                } catch (e) {
+                  log(`Raw response: ${xhr.responseText}`);
+                }
+              }
+
+              if (xhr.status >= 200 && xhr.status < 300) {
+                log("Post deleted successfully!");
+                // Reload posts to update the UI
+                loadPosts();
+              } else {
+                log(`Error deleting post: ${xhr.status} ${xhr.statusText}`);
+              }
+            }
+          };
+
+          xhr.onerror = function () {
+            log("Network error occurred");
+          };
+
+          xhr.send();
+        } catch (error) {
+          console.error("Error in deletePost function:", error);
+          log(`Error: ${error.message}`);
+        }
+      }
+
+      function log(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        resultsContainer.textContent += `[${timestamp}] ${message}\n`;
+        resultsContainer.scrollTop = resultsContainer.scrollHeight;
+      }
+    </script>
+  </body>
+</html>

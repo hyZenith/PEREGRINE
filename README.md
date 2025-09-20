@@ -106,12 +106,12 @@ PEREGRINE/
 
    ```properties
    PORT=3000
-   MONGO_URI=mongodb://localhost:27017/nigathon_sentiment
-   JWT_SECRET=supersecretkey123
-   ADMIN_EMAIL=admin@example.com
-   ADMIN_PASSWORD=admin123
-   PYTHON_PATH=python
-   GEMINI_API_KEY=AIzaSyAowCOjjK0L2hFR31sE5ZJttuq_m0uKFxs
+   MONGO_URI
+   JWT_SECRET
+   ADMIN_EMAIL
+   ADMIN_PASSWORD
+   PYTHON_PATH
+   GEMINI_API_KEY
    ```
 
    > Note: The Gemini API key provided may have limited quota. For development purposes, it's recommended to [obtain your own API key](https://ai.google.dev/) for unlimited testing.
@@ -205,13 +205,3 @@ net start MongoDB
 # Linux/Mac
 sudo systemctl start mongod
 ```
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-- `POST /admin/posts` - Create a new post (admin only)
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
