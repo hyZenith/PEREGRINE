@@ -35,16 +35,6 @@ app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 app.use('/posts', postRoutes);
 
-
-
-// Admin routes
-// app.post("/admin/posts",
-//   authenticateToken,
-//   isAdmin,
-//   upload.array("files", 5),
-//   createPost
-// );
-
 // Serve Python scripts for sentiment analysis
 app.use("/utils", express.static(path.join(__dirname, "utils")));
 
