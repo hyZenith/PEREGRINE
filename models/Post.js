@@ -15,6 +15,7 @@ const postSchema = new mongoose.Schema({
   ],
   isDraft: { type: Boolean, default: false },
   likes: { type: Number, default: 0 },
+  likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // store user IDs
   comments: [
     {
       username: { type: String, required: true }, // Can be any non-user

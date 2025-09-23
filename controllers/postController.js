@@ -8,14 +8,83 @@ const getPosts = async (req, res) => {
   if (!posts) return res.send("There is no Post");
 };
 
-const likedPost = async (req, res) => {
-  const post = await Post.findById(req.params.id);
-  if (!post) return res.status(404).json({ message: "post not found" });
+// const likedPost = async (req, res) => {
+//   const post = await Post.findById(req.params.id);
+//   if (!post) return res.status(404).json({ message: "post not found" });
 
-  post.likes += 1;
-  await post.save();
-  res.json({ message: "post liked" });
+//   post.likes += 1;
+//   await post.save();
+//   res.json({ message: "post liked" });
+// };
+// const likedPost = async (req, res) => {
+//   try {
+//     const post = await Post.findById(req.params.id);
+//     if (!post) return res.status(404).json({ message: "Post not found" });
+
+//     const userId = req.user.id; // assuming your authenticateToken middleware sets req.user
+
+//     // Initialize likedBy array if it doesn't exist
+//     if (!post.likedBy) post.likedBy = [];
+
+//     if (post.likedBy.includes(userId)) {
+//       // User already liked -> Unlike
+//       post.likedBy = post.likedBy.filter(id => id.toString() !== userId);
+//       post.likes = Math.max(post.likes - 1, 0);
+//     } else {
+//       // User has not liked -> Like
+//       post.likedBy.push(userId);
+//       post.likes += 1;
+//     }
+
+//     await post.save();
+
+//     // Send back updated like count and whether user liked it
+//     res.json({ likes: post.likes, liked: post.likedBy.includes(userId) });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Error updating like" });
+//   }
+// };
+const likedPost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    const userId = req.user.id; // string
+
+    // Ensure likedBy is an array
+    if (!Array.isArray(post.likedBy)) post.likedBy = [];
+
+    // Remove nulls from likedBy
+    post.likedBy = post.likedBy.filter(id => id != null);
+
+    let liked;
+
+    if (post.likedBy.map(id => id.toString()).includes(userId)) {
+      // User already liked -> Unlike
+      post.likedBy = post.likedBy.filter(id => id.toString() !== userId);
+      post.likes = Math.max(post.likes - 1, 0);
+      liked = false; // user just unliked
+    } else {
+      // User has not liked -> Like
+      post.likedBy.push(userId);
+      post.likes += 1;
+      liked = true; // user just liked
+    }
+
+    await post.save();
+
+    // Send back updated like count and whether user liked it
+    res.json({ likes: post.likes, liked });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error updating like" });
+  }
 };
+
+
+
+
 
 const commentPost = async (req, res) => {
   try {

@@ -31,9 +31,11 @@ const analyzeSentiment = (comment) => {
 
     // When the process exits
     pythonProcess.on("close", (code) => {
-      // Delete the temporary file
+      // Delete the temporary file safely
       try {
-        fs.unlinkSync(tempFilePath);
+        if (fs.existsSync(tempFilePath)) {
+          fs.unlinkSync(tempFilePath);
+        }
       } catch (err) {
         console.error("Error deleting temporary file:", err);
       }

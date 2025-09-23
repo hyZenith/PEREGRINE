@@ -540,3 +540,12 @@ body {
 .create-post-action:hover {
   background-color: #f0f2f5;
 }
+
+
+.share-menu a {
+  color: #555;
+  transition: color 0.2s;
+}
+.share-menu a:hover {
+  color: lightblue;
+}
