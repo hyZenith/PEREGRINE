@@ -64,3 +64,4 @@ yarn-error.log*
 # Application specific
 ai_model/*.h5
 *.sav
+utils/temp_comment.txt
